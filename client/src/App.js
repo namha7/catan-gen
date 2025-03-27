@@ -1,10 +1,21 @@
 import React, { useState, useEffect } from 'react'
 import Board from "./Board"
 
+
 function App() {
 
-  const [data, setData] = useState([{}])
+  function generateBoard() {
+    fetch("/fields").then(
+      res => res.json()
+    ).then(
+      data => {
+            setData(data)
+            console.log(data)
+      }
+    )
+  }
 
+  const [data, setData] = useState([])
   useEffect(() => {
     fetch("/fields").then(
       res => res.json()
@@ -21,6 +32,7 @@ function App() {
   return (
     <div>
       <h1>Basic Catan Board Generator</h1>
+      <button onClick={generateBoard}>Shuffle</button>
       <Board fields={data}/>
       {(typeof data.fields === "undefined") ? (
         <p>Loading...</p>

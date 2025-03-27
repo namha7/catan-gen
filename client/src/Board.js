@@ -7,13 +7,11 @@ import App from "./App"
 class Board extends Component {
   render() {
 
-
-
     const hexagons = GridGenerator.hexagon(2);
     const hexSize = { x: 10, y: 10 };
 
     //const fields = ['Clay', 'Wood', 'Sheep', 'Sheep', 'Wood', 'Clay', 'Sheep', 'Wheat', 'Wheat', 'Wood', 'Ore', 'Wheat', 'Ore', 'Clay', 'Desert', 'Wheat', 'Ore', 'Sheep', 'Wood']
-    const fields = this.props.fields
+    var fields = this.props.fields
     
     
     return (
@@ -31,13 +29,16 @@ class Board extends Component {
           
           <Layout
             size={hexSize}
-            spacing={1.009}
+            spacing={1.009} 
             flat={false}
             origin={{ x: 0, y: 0 }}
           >
-            {hexagons.map((hex, i) => {
-                const fieldType = fields[i]
-                return (<Hexagon key={i} q={hex.q} r={hex.r} s={hex.s} fill={fieldType}/>);
+            {fields.map((field, i) => {
+                var fieldType = field.type   
+                var coordinate_q = field.coordinates.q
+                var coordinate_r = field.coordinates.r
+                var coordinate_s = field.coordinates.s
+                return (<Hexagon key={i} q={coordinate_q} r={coordinate_r} s={coordinate_s} fill={fieldType}/>);
             }
 
             )}
