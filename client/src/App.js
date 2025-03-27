@@ -6,7 +6,7 @@ function App() {
   const [data, setData] = useState([{}])
 
   useEffect(() => {
-    fetch("/members").then(
+    fetch("/fields").then(
       res => res.json()
     ).then(
       data => {
@@ -15,18 +15,25 @@ function App() {
       }
     )
   }, [])
+
+
+  
   return (
     <div>
       <h1>Basic Catan Board Generator</h1>
-      <Board />
-      {(typeof data.members === "undefined") ? (
+      <Board fields={data}/>
+      {(typeof data.fields === "undefined") ? (
         <p>Loading...</p>
       ) : ( 
-        data.members.map((member, i) => (
-          <p key={i}>{member}</p>
+        data.fields.map((fields, i) => (
+          <p key={i}>{fields}</p>
         ))
       )}
+    <pre>
+    {JSON.stringify(data, null, 2)}
+    </pre>
     </div>
+
   )
 }
 

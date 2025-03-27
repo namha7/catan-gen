@@ -2,11 +2,20 @@ import React, { Component } from 'react';
 import {
   HexGrid, Layout, Hexagon, GridGenerator, Pattern
 } from 'react-hexgrid';
+import App from "./App"
+
 class Board extends Component {
   render() {
+
+
+
     const hexagons = GridGenerator.hexagon(2);
     const hexSize = { x: 10, y: 10 };
-    const fields = ["Desert", "Ore", "Ore", "Ore", "Clay", "Clay", "Clay", "Wheat", "Wheat", "Wheat", "Wheat", "Sheep", "Sheep", "Sheep", "Sheep", "Wood", "Wood", "Wood", "Wood",]
+
+    //const fields = ['Clay', 'Wood', 'Sheep', 'Sheep', 'Wood', 'Clay', 'Sheep', 'Wheat', 'Wheat', 'Wood', 'Ore', 'Wheat', 'Ore', 'Clay', 'Desert', 'Wheat', 'Ore', 'Sheep', 'Wood']
+    const fields = this.props.fields
+    
+    
     return (
       <div className="App">
         <HexGrid width={1200} height={1000}>
