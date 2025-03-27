@@ -1,6 +1,8 @@
 from flask import Flask, jsonify
 import random
 from flask_cors import CORS
+import hex
+import string
 
 
 app = Flask(__name__)
@@ -168,7 +170,42 @@ def members():
             "number": number,
             "coordinates": coordinate
         })
+    doOreTilesTouch(boardData)
+    doBrickTilesTouch(boardData)
     return jsonify(boardData)
+
+hex_directions = [
+    hex.Hex(1, 0, -1),
+    hex.Hex(1, -1, 0),
+    hex.Hex(0, -1, 1),
+    hex.Hex(-1, 0, 1),
+    hex.Hex(-1, 1, 0),
+    hex.Hex(0, 1, -1)
+]
+
+
+## Alle Steinfelder in BoardData suchen und abspeichern
+# alle Nachbarn in liste speichern
+# wenn nachbarn feldtyp = stein enthalten;: false
+# sonst true
+def doOreTilesTouch(boardData): 
+    oreTiles = []
+    neighbors = []
+
+    for i in range(len(boardData)):
+        if boardData[i]["type"] == "Ore":
+            oreTiles.append(boardData[i])
+    print(oreTiles)
+
+def doBrickTilesTouch(boardData): 
+    brickTiles = []
+    neighbors = []
+
+    for i in range(len(boardData)):
+        if boardData[i]["type"] == "Clay":
+            brickTiles.append(boardData[i])
+    print(brickTiles)       
+
 
 
 if __name__ == "__main__":
