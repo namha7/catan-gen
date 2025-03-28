@@ -123,37 +123,43 @@ boardDataDummy = [
         "coordinates": {"q": 0, "r": 2, "s": -2}
     }
 ]
+coordinates = [
+    {"q": 0, "r": -2, "s": 2},
+    {"q": 1, "r": -2, "s": 1},
+    {"q": 2, "r": -2, "s": 0},
+    {"q": -1, "r": -1, "s": 2},
+    {"q": 0, "r": -1, "s": 1},
+    {"q": 1, "r": -1, "s": 0},
+    {"q": 2, "r": -1, "s": -1},
+    {"q": -2, "r": 0, "s": 2},
+    {"q": -1, "r": 0, "s": 1},
+    {"q": 0, "r": 0, "s": 0},
+    {"q": 1, "r": 0, "s": -1},
+    {"q": 2, "r": 0, "s": -2},
+    {"q": -2, "r": 1, "s": 1},
+    {"q": -1, "r": 1, "s": 0},
+    {"q": 0, "r": 1, "s": -1},
+    {"q": 1, "r": 1, "s": -2},
+    {"q": -2, "r": 2, "s": 0},
+    {"q": -1, "r": 2, "s": -1},
+    {"q": 0, "r": 2, "s": -2}
+    ]
 
 @app.route("/fields")
 def members():
     fields = ["Desert", "Ore", "Ore", "Ore", "Clay", "Clay", "Clay", "Wheat", "Wheat", "Wheat", "Wheat", "Sheep", "Sheep", "Sheep", "Sheep", "Wood", "Wood", "Wood", "Wood",]
     numbers = [2,3,3,4,4,5,5,6,6,8,8,9,9,10,10,11,11,12]
-    coordinates = [
-        {"q": 0, "r": -2, "s": 2},
-        {"q": 1, "r": -2, "s": 1},
-        {"q": 2, "r": -2, "s": 0},
-        {"q": -1, "r": -1, "s": 2},
-        {"q": 0, "r": -1, "s": 1},
-        {"q": 1, "r": -1, "s": 0},
-        {"q": 2, "r": -1, "s": -1},
-        {"q": -2, "r": 0, "s": 2},
-        {"q": -1, "r": 0, "s": 1},
-        {"q": 0, "r": 0, "s": 0},
-        {"q": 1, "r": 0, "s": -1},
-        {"q": 2, "r": 0, "s": -2},
-        {"q": -2, "r": 1, "s": 1},
-        {"q": -1, "r": 1, "s": 0},
-        {"q": 0, "r": 1, "s": -1},
-        {"q": 1, "r": 1, "s": -2},
-        {"q": -2, "r": 2, "s": 0},
-        {"q": -1, "r": 2, "s": -1},
-        {"q": 0, "r": 2, "s": -2}
-        ]
+    print("##################################################################")
+    boardData = generateBoardData(fields,numbers,coordinates)
+    while doBrickTilesTouch(boardData) or doOreTilesTouch(boardData):
+        boardData = generateBoardData(fields,numbers,coordinates)
 
+    return jsonify(boardData)
+
+def generateBoardData(fields, numbers, coordinates):
     random.shuffle(fields)
     random.shuffle(numbers)
     random.shuffle(coordinates)
-
     boardData = []
     num_index = 0
     for i in range(len(fields)):
@@ -170,9 +176,7 @@ def members():
             "number": number,
             "coordinates": coordinate
         })
-    doOreTilesTouch(boardData)
-    doBrickTilesTouch(boardData)
-    return jsonify(boardData)
+    return boardData
 
 hex_directions = [
     hex.Hex(1, 0, -1),
@@ -182,6 +186,58 @@ hex_directions = [
     hex.Hex(-1, 1, 0),
     hex.Hex(0, 1, -1)
 ]
+# koordinaten in json format für bessere verarbeitung
+def makeCoord(q,r,s):
+    coord = {"q": q, "r": r, "s": s}
+    return coord
+# prüft ob koordinate im board ist
+def isPartOfBoard(q,r,s):
+    coord = makeCoord(q,r,s)
+    print(coord)
+    if coord not in coordinates:
+        return False
+    return True
+
+
+# boardData, tilesArray, neighborFieldType, numberOfNeighbors
+# durch tilesarray iterieren und nachbarn in boardData finden, speichert den nachbarn in liste wenn er bestimmten typ neighborFieldType hat und gibt true wenn die liste so lang ist wie numberofneighbors
+def hasNeighbor(boardData, tilesArray, neighborFieldType, numberOfNeighborsWithFieldType):
+    
+    # findet Koordinaten von den tiles im Array
+    for tile in tilesArray:
+        hexCoordinates = tile["coordinates"]
+        q = hexCoordinates["q"]
+        r = hexCoordinates["r"]
+        s = hexCoordinates["s"]
+        print("Looking for neighbors of tile:",q,r,s)
+        neighborsWithFieldType = 0
+
+        # guckt alle nachbarn für ein tile an
+        for direction in range(6):
+            neighbor_q = hex.hex_neighbor(hex.Hex(q,r,s), direction).q
+            neighbor_r = hex.hex_neighbor(hex.Hex(q,r,s), direction).r
+            neighbor_s = hex.hex_neighbor(hex.Hex(q,r,s), direction).s
+            if isPartOfBoard(neighbor_q,neighbor_r,neighbor_s):
+                for boardTile in boardData:
+                    coord = boardTile["coordinates"]
+                    if (coord["q"] == neighbor_q and
+                        coord["r"] == neighbor_r and
+                        coord["s"] == neighbor_s):
+                        if boardTile["type"] == neighborFieldType:
+                            neighborsWithFieldType += 1
+                        break
+                            
+
+        if neighborsWithFieldType == numberOfNeighborsWithFieldType:
+            print("Tile at" + str(q) + str(r) + str(s) + "has" + str(numberOfNeighborsWithFieldType)+ "neighbors with type " + neighborFieldType)
+            return True
+        
+    return False
+        
+                
+
+                
+
 
 
 ## Alle Steinfelder in BoardData suchen und abspeichern
@@ -190,21 +246,20 @@ hex_directions = [
 # sonst true
 def doOreTilesTouch(boardData): 
     oreTiles = []
-    neighbors = []
 
     for i in range(len(boardData)):
         if boardData[i]["type"] == "Ore":
             oreTiles.append(boardData[i])
-    print(oreTiles)
+    return hasNeighbor(boardData, oreTiles, "Ore", 1)
 
 def doBrickTilesTouch(boardData): 
     brickTiles = []
-    neighbors = []
 
     for i in range(len(boardData)):
         if boardData[i]["type"] == "Clay":
             brickTiles.append(boardData[i])
-    print(brickTiles)       
+    return hasNeighbor(boardData, brickTiles, "Clay", 1)
+    
 
 
 
