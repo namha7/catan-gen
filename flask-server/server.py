@@ -151,7 +151,7 @@ def members():
     numbers = [2,3,3,4,4,5,5,6,6,8,8,9,9,10,10,11,11,12]
     print("##################################################################")
     boardData = generateBoardData(fields,numbers,coordinates)
-    while doBrickTilesTouch(boardData) or doOreTilesTouch(boardData):
+    while doBrickTilesTouch(boardData) or doOreTilesTouch(boardData) or doesSheepHaveTwoNeighbors(boardData) or doesWoodHaveTwoNeighbors(boardData) or doesWheatHaveTwoNeighbors(boardData):
         boardData = generateBoardData(fields,numbers,coordinates)
 
     return jsonify(boardData)
@@ -234,10 +234,29 @@ def hasNeighbor(boardData, tilesArray, neighborFieldType, numberOfNeighborsWithF
         
     return False
         
-                
+def doesWoodHaveTwoNeighbors(boardData):
+    woodTiles = []
 
+    for i in range(len(boardData)):
+        if boardData[i]["type"] == "Wood":
+            woodTiles.append(boardData[i])
+    return hasNeighbor(boardData, woodTiles, "Wood", 2)
                 
+def doesWheatHaveTwoNeighbors(boardData):
+    wheatTiles = []
 
+    for i in range(len(boardData)):
+        if boardData[i]["type"] == "Wheat":
+            wheatTiles.append(boardData[i])
+    return hasNeighbor(boardData, wheatTiles, "Wheat", 2)
+
+def doesSheepHaveTwoNeighbors(boardData):
+    sheepTiles = []
+
+    for i in range(len(boardData)):
+        if boardData[i]["type"] == "Sheep":
+            sheepTiles.append(boardData[i])
+    return hasNeighbor(boardData, sheepTiles, "Sheep", 2)
 
 
 ## Alle Steinfelder in BoardData suchen und abspeichern
