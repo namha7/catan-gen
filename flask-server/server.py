@@ -232,7 +232,7 @@ def doesSameNumberTouch(boardData):
             if  touchingNumbers >= 1:
                 return True
     return False
-# bugged
+
 def doSixAndEightTouch(boardData):
 
     for i in range(len(boardData)):
