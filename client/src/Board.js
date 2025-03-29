@@ -1,6 +1,6 @@
-import React, { Component } from 'react';
+import React, { Fragment, Component } from 'react';
 import {
-  HexGrid, Layout, Hexagon, GridGenerator, Pattern
+  HexGrid, Layout, Hexagon, GridGenerator, Pattern, Text
 } from 'react-hexgrid';
 import App from "./App"
 
@@ -38,10 +38,11 @@ class Board extends Component {
                 var coordinate_q = field.coordinates.q
                 var coordinate_r = field.coordinates.r
                 var coordinate_s = field.coordinates.s
-                return (<Hexagon key={i} q={coordinate_q} r={coordinate_r} s={coordinate_s} fill={fieldType}/>);
+                return(<Hexagon key={i} q={coordinate_q} r={coordinate_r} s={coordinate_s} fill={fieldType}>
+                    <Text>{field.number}</Text>
+                </Hexagon> );
             }
-
-            )}
+            )} 
           </Layout>
         </HexGrid>
       </div>

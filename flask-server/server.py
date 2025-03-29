@@ -151,7 +151,7 @@ def members():
     numbers = [2,3,3,4,4,5,5,6,6,8,8,9,9,10,10,11,11,12]
     print("##################################################################")
     boardData = generateBoardData(fields,numbers,coordinates)
-    while doBrickTilesTouch(boardData) or doOreTilesTouch(boardData) or doesSheepHaveTwoNeighbors(boardData) or doesWoodHaveTwoNeighbors(boardData) or doesWheatHaveTwoNeighbors(boardData):
+    while doesSameNumberTouch(boardData) or doSixAndEightTouch(boardData) or doBrickTilesTouch(boardData) or doOreTilesTouch(boardData) or doesSheepHaveTwoNeighbors(boardData) or doesWoodHaveTwoNeighbors(boardData) or doesWheatHaveTwoNeighbors(boardData):
         boardData = generateBoardData(fields,numbers,coordinates)
 
     return jsonify(boardData)
@@ -198,7 +198,65 @@ def isPartOfBoard(q,r,s):
         return False
     return True
 
+def doesSameNumberTouch(boardData):
+    numbersArray = [2,3,4,5,6,8,9,10,11,12]
+    for number in numbersArray:
+        numbers = []
 
+        for i in range(len(boardData)):
+            if boardData[i]["number"] == number:
+                numbers.append(boardData[i])
+        for tile in numbers:
+            hexCoordinates = tile["coordinates"]
+            q = hexCoordinates["q"]
+            r = hexCoordinates["r"]
+            s = hexCoordinates["s"]
+            touchingNumbers = 0
+            for direction in range(6):
+                neighbor_q = hex.hex_neighbor(hex.Hex(q,r,s), direction).q
+                neighbor_r = hex.hex_neighbor(hex.Hex(q,r,s), direction).r
+                neighbor_s = hex.hex_neighbor(hex.Hex(q,r,s), direction).s
+                if isPartOfBoard(neighbor_q,neighbor_r,neighbor_s):
+                    for boardTile in boardData:
+                        coord = boardTile["coordinates"]
+                        if (coord["q"] == neighbor_q and
+                            coord["r"] == neighbor_r and
+                            coord["s"] == neighbor_s):
+                            if boardTile["number"] == number:
+                                touchingNumbers += 1
+                            break
+            if  touchingNumbers >= 1:
+                return True
+    return False
+
+def doSixAndEightTouch(boardData):
+
+    for i in range(len(boardData)):
+        numbers = []
+        if boardData[i]["number"] == 6 or boardData[i]["number"] == 8:
+            numbers.append(boardData[i])
+    for tile in numbers:
+        hexCoordinates = tile["coordinates"]
+        q = hexCoordinates["q"]
+        r = hexCoordinates["r"]
+        s = hexCoordinates["s"]
+        touchingSixAndEights = 0
+        for direction in range(6):
+            neighbor_q = hex.hex_neighbor(hex.Hex(q,r,s), direction).q
+            neighbor_r = hex.hex_neighbor(hex.Hex(q,r,s), direction).r
+            neighbor_s = hex.hex_neighbor(hex.Hex(q,r,s), direction).s
+            if isPartOfBoard(neighbor_q,neighbor_r,neighbor_s):
+                for boardTile in boardData:
+                    coord = boardTile["coordinates"]
+                    if (coord["q"] == neighbor_q and
+                        coord["r"] == neighbor_r and
+                        coord["s"] == neighbor_s):
+                        if boardTile["number"] == 6 or boardTile["number"] == 8:
+                            touchingSixAndEights += 1
+                        break
+        if touchingSixAndEights >= 1:
+            return True
+    return False
 # boardData, tilesArray, neighborFieldType, numberOfNeighbors
 # durch tilesarray iterieren und nachbarn in boardData finden, speichert den nachbarn in liste wenn er bestimmten typ neighborFieldType hat und gibt true wenn die liste so lang ist wie numberofneighbors
 def hasNeighbor(boardData, tilesArray, neighborFieldType, numberOfNeighborsWithFieldType):
@@ -228,7 +286,7 @@ def hasNeighbor(boardData, tilesArray, neighborFieldType, numberOfNeighborsWithF
                         break
                             
 
-        if neighborsWithFieldType == numberOfNeighborsWithFieldType:
+        if neighborsWithFieldType >= numberOfNeighborsWithFieldType:
             print("Tile at" + str(q) + str(r) + str(s) + "has" + str(numberOfNeighborsWithFieldType)+ "neighbors with type " + neighborFieldType)
             return True
         
@@ -241,7 +299,7 @@ def doesWoodHaveTwoNeighbors(boardData):
         if boardData[i]["type"] == "Wood":
             woodTiles.append(boardData[i])
     return hasNeighbor(boardData, woodTiles, "Wood", 2)
-                
+    
 def doesWheatHaveTwoNeighbors(boardData):
     wheatTiles = []
 
