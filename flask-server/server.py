@@ -147,13 +147,17 @@ coordinates = [
 
 @app.route("/fields")
 def members():
+    attempts = 0
     fields = ["Desert", "Ore", "Ore", "Ore", "Clay", "Clay", "Clay", "Wheat", "Wheat", "Wheat", "Wheat", "Sheep", "Sheep", "Sheep", "Sheep", "Wood", "Wood", "Wood", "Wood",]
     numbers = [2,3,3,4,4,5,5,6,6,8,8,9,9,10,10,11,11,12]
     print("##################################################################")
     boardData = generateBoardData(fields,numbers,coordinates)
-    while doesSameNumberTouch(boardData) or doSixAndEightTouch(boardData) or doBrickTilesTouch(boardData) or doOreTilesTouch(boardData) or doesSheepHaveTwoNeighbors(boardData) or doesWoodHaveTwoNeighbors(boardData) or doesWheatHaveTwoNeighbors(boardData):
+    attempts += 1
+    while doesSameNumberTouch(boardData) or doBrickTilesTouch(boardData) or doOreTilesTouch(boardData) or doesSheepHaveTwoNeighbors(boardData) or doesWoodHaveTwoNeighbors(boardData) or doesWheatHaveTwoNeighbors(boardData):
         boardData = generateBoardData(fields,numbers,coordinates)
-
+        attempts += 1
+    
+    print("generated board after "+ str(attempts) + " attempts")
     return jsonify(boardData)
 
 def generateBoardData(fields, numbers, coordinates):
@@ -228,12 +232,13 @@ def doesSameNumberTouch(boardData):
             if  touchingNumbers >= 1:
                 return True
     return False
-
+# bugged
 def doSixAndEightTouch(boardData):
 
     for i in range(len(boardData)):
-        numbers = []
+        
         if boardData[i]["number"] == 6 or boardData[i]["number"] == 8:
+            numbers = []
             numbers.append(boardData[i])
     for tile in numbers:
         hexCoordinates = tile["coordinates"]
