@@ -153,7 +153,7 @@ def members():
     print("##################################################################")
     boardData = generateBoardData(fields,numbers,coordinates)
     attempts += 1
-    while doesSameNumberTouch(boardData) or doBrickTilesTouch(boardData) or doOreTilesTouch(boardData) or doesSheepHaveTwoNeighbors(boardData) or doesWoodHaveTwoNeighbors(boardData) or doesWheatHaveTwoNeighbors(boardData):
+    while doSixAndEightTouch(boardData) or doesSameNumberTouch(boardData) or doBrickTilesTouch(boardData) or doOreTilesTouch(boardData) or doesSheepHaveTwoNeighbors(boardData) or doesWoodHaveTwoNeighbors(boardData) or doesWheatHaveTwoNeighbors(boardData):
         boardData = generateBoardData(fields,numbers,coordinates)
         attempts += 1
     
@@ -234,11 +234,9 @@ def doesSameNumberTouch(boardData):
     return False
 
 def doSixAndEightTouch(boardData):
-
+    numbers = []
     for i in range(len(boardData)):
-        
         if boardData[i]["number"] == 6 or boardData[i]["number"] == 8:
-            numbers = []
             numbers.append(boardData[i])
     for tile in numbers:
         hexCoordinates = tile["coordinates"]
