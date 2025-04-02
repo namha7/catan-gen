@@ -34,9 +34,6 @@ npm start
 ```bash
 cd flask-server
 ```
-```bash
-python -m venv venv
-```
 activate virtual environment:
 windows:
 ```bash
